@@ -1,0 +1,36 @@
+name: Terraform Backend Setup
+
+on:
+  workflow_dispatch:
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Apply Terraform
+        env:
+          AWS_REGION: eu-west-1
+          BUCKET_NAME: ${{ github.repository }}-tf-backend  # e.g. org-name/repo-name-tf-backend
+        run: |
+          bucket_safe_name=$(echo "$BUCKET_NAME" | tr '[:upper:]/' '[:lower:]-')
+          terraform apply -auto-approve -var="bucket_name=$bucket_safe_name"
