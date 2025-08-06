@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "terraform_state" {
-  bucket = "my-tf-backend-bucket-12345"  # change to a globally unique name
+  bucket = var.bucket_name
   lifecycle {
     prevent_destroy = true
   }
