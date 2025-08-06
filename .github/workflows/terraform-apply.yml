@@ -28,4 +28,8 @@ jobs:
         run: terraform init
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        env:
+          BUCKET_NAME: ${{ github.repository }}-tf-backend
+        run: |
+          bucket_safe_name=$(echo "$BUCKET_NAME" | tr '[:upper:]/' '[:lower:]-')
+          terraform apply -auto-approve -var="bucket_name=$bucket_safe_name"

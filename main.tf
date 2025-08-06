@@ -4,7 +4,7 @@ provider "aws" {
 
 terraform {
   backend "s3" {
-    bucket         = "tfstate-bucket-647200426149"
+    bucket         = var.bucket_name
     key            = "terraform.tfstate"
     dynamodb_table = "terraform-locks"
     encrypt        = true

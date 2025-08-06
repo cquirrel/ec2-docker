@@ -27,7 +27,7 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
-      - name: Apply Terraform
+      - name: Terraform Apply
         env:
           AWS_REGION: eu-west-1
           BUCKET_NAME: ${{ github.repository }}-tf-backend  # e.g. org-name/repo-name-tf-backend
