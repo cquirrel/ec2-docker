@@ -1,5 +1,9 @@
+resource "random_id" "suffix" {
+  byte_length = 4
+}
+
 resource "aws_s3_bucket" "deploy_bucket" {
-  bucket = "docker-images-bucket-243234234"
+  bucket = "cquirrel-builds-${random_id.suffix.hex}"
 
   tags = {
     Name = "DeployArtifacts"
