@@ -36,7 +36,7 @@ jobs:
             -backend-config="dynamodb_table=terraform-locks" \
             -backend-config="encrypt=true"
 
-      - name: Terraform Apply
+      - name: Terraform Destroy
         env:
           AWS_REGION: eu-west-1
           BUCKET_NAME: ${{ github.repository }}-tf-backend  # e.g. org-name/repo-name-tf-backend
