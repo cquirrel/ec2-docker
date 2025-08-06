@@ -25,7 +25,16 @@ jobs:
           terraform_version: 1.8.2
 
       - name: Terraform Init
-        run: terraform init
+        env:
+          BUCKET_NAME: ${{ github.repository }}-tf-backend
+        run: |
+          bucket_safe_name=$(echo "$BUCKET_NAME" | tr '[:upper:]/' '[:lower:]-')
+          terraform init \
+            -backend-config="bucket=$bucket_safe_name" \
+            -backend-config="key=terraform.tfstate" \
+            -backend-config="region=eu-west-1" \
+            -backend-config="dynamodb_table=terraform-locks" \
+            -backend-config="encrypt=true"
 
       - name: Terraform Apply
         env:

@@ -3,12 +3,7 @@ provider "aws" {
 }
 
 terraform {
-  backend "s3" {
-    bucket         = var.bucket_name
-    key            = "terraform.tfstate"
-    dynamodb_table = "terraform-locks"
-    encrypt        = true
-  }
+  backend "s3" {}
 }
 
 # resource "aws_key_pair" "deployer" {
