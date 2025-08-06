@@ -36,5 +36,10 @@ jobs:
             -backend-config="dynamodb_table=terraform-locks" \
             -backend-config="encrypt=true"
 
-      - name: Terraform Destroy
-        run: terraform destroy -auto-approve
+      - name: Terraform Apply
+        env:
+          AWS_REGION: eu-west-1
+          BUCKET_NAME: ${{ github.repository }}-tf-backend  # e.g. org-name/repo-name-tf-backend
+        run: |
+          bucket_safe_name=$(echo "$BUCKET_NAME" | tr '[:upper:]/' '[:lower:]-')
+          terraform destroy -auto-approve -var="bucket_name=$bucket_safe_name"
