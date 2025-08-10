@@ -1,6 +1,4 @@
-provider "aws" {
-  region = "eu-west-1"
-}
+provider "aws" {}
 
 terraform {
   backend "s3" {}

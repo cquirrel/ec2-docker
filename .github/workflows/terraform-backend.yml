@@ -22,14 +22,14 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-west-1
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Terraform Init
         run: terraform init
 
       - name: Terraform Apply
         env:
-          AWS_REGION: eu-west-1
+          AWS_REGION: ${{ secrets.AWS_REGION }}
           BUCKET_NAME: ${{ github.repository }}-tf-backend  # e.g. org-name/repo-name-tf-backend
         run: |
           bucket_safe_name=$(echo "$BUCKET_NAME" | tr '[:upper:]/' '[:lower:]-')
