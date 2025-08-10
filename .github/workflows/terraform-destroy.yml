@@ -44,7 +44,7 @@ jobs:
       - name: Terraform Destroy
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
-          BUCKET_NAME: ${{ github.repository }}-tf-backend  # e.g. org-name/repo-name-tf-backend
         run: |
-          bucket_safe_name=$(echo "$BUCKET_NAME" | tr '[:upper:]/' '[:lower:]-')
-          terraform destroy -auto-approve -var="bucket_name=$bucket_safe_name"
+          terraform destroy -auto-approve \
+            -var="bucket_name=${{ steps.vars.outputs.bucket_safe_name }}"
+            -var="portainer_admin_password=${{ secrets.PORTAINER_ADMIN_PASSWORD }}"
