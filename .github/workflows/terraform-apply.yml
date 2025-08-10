@@ -49,5 +49,5 @@ jobs:
       - name: Terraform Apply
         run: |
           terraform apply -auto-approve \
-            -var="bucket_name=${{ steps.vars.outputs.bucket_safe_name }}"
+            -var="bucket_name=${{ steps.vars.outputs.bucket_safe_name }}" \
             -var="portainer_admin_password=${{ inputs.portainer_admin_password }}"
