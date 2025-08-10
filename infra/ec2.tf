@@ -156,7 +156,7 @@ resource "aws_instance" "web" {
     Name = "DockerHost"
   }
 
-  # provisioner "local-exec" {
-  #   command = "bash ./generate_inventory.sh ${self.public_ip}"
-  # }
+  provisioner "local-exec" {
+    command = "echo ${self.public_dns}"
+  }
 }

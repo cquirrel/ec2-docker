@@ -15,6 +15,7 @@ runcmd:
   # Fetch password from AWS Secrets Manager
   - export PORTAINER_PASS=$(aws secretsmanager get-secret-value --secret-id portainer/admin-password --query SecretString --output text --region eu-west-1)
   - export PORTAINER_PASS_BCRYPT=$(docker run --rm httpd:2.4-alpine htpasswd -nbB admin "$PORTAINER_PASS" | cut -d ":" -f2)
+  - docker image rm httpd:2.4-alpine
 
   # Run Portainer
   - docker volume create portainer_data
