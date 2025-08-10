@@ -46,5 +46,5 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
           terraform destroy -auto-approve \
-            -var="bucket_name=${{ steps.vars.outputs.bucket_safe_name }}"
+            -var="bucket_name=${{ steps.vars.outputs.bucket_safe_name }}" \
             -var="portainer_admin_password=${{ secrets.PORTAINER_ADMIN_PASSWORD }}"
