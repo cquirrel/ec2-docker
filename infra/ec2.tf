@@ -1,10 +1,12 @@
+data "aws_caller_identity" "current" {}
+
 data "aws_ami" "amazon_linux" {
   most_recent = true
   owners      = ["amazon"]
 
   filter {
     name   = "name"
-    values = ["al2023-ami-ecs-hvm-*"]
+    values = ["al2023-ami-2023*"]
   }
 
   filter {
@@ -23,7 +25,7 @@ data "aws_ami" "amazon_linux" {
   }
 }
 
-resource "aws_security_group" "allow_ssh" {
+resource "aws_security_group" "sg" {
   name        = "allow_ssh"
   description = "Allow SSH inbound traffic"
 
@@ -79,6 +81,13 @@ resource "aws_iam_role" "ec2_ssm_role" {
           Service = "ec2.amazonaws.com"
         },
         Action = "sts:AssumeRole"
+      },
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "secretsmanager.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
       }
     ]
   })
@@ -115,6 +124,13 @@ resource "aws_iam_role_policy" "ec2_ssm_policy" {
           "s3:GetObject"
         ],
         Resource = "arn:aws:s3:::your-deploy-bucket/*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "secretsmanager:GetSecretValue"
+        ],
+        Resource = "arn:aws:secretsmanager:eu-west-1:${data.aws_caller_identity.current.account_id}:secret:portainer/admin-password*"
       }
     ]
   })
@@ -130,9 +146,11 @@ resource "aws_instance" "web" {
   instance_type          = "t2.micro"
   #key_name               = aws_key_pair.deployer.key_name
   iam_instance_profile   = aws_iam_instance_profile.ec2_ssm_instance_profile.name
-  vpc_security_group_ids = [aws_security_group.allow_ssh.id]
-
+  vpc_security_group_ids = [aws_security_group.sg.id]
   user_data              = file("cloud-init.yml")
+  depends_on = [
+    aws_secretsmanager_secret.portainer_password
+  ]
 
   tags = {
     Name = "DockerHost"

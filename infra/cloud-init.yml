@@ -2,6 +2,7 @@
 
 packages:
   - docker
+  - awscli  # Needed to pull from Secrets Manager
 
 runcmd:
   - systemctl start docker
@@ -10,5 +11,11 @@ runcmd:
   - curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
   - chmod +x /usr/local/bin/docker-compose
   - ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+  # Fetch password from AWS Secrets Manager
+  - export PORTAINER_PASS=$(aws secretsmanager get-secret-value --secret-id portainer/admin-password --query SecretString --output text --region eu-west-1)
+  - export PORTAINER_PASS_BCRYPT=$(docker run --rm httpd:2.4-alpine htpasswd -nbB admin "$PORTAINER_PASS" | cut -d ":" -f2)
+
+  # Run Portainer
   - docker volume create portainer_data
-  - docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:lts
+  - docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:lts --admin-password="${PORTAINER_PASS_BCRYPT}"
