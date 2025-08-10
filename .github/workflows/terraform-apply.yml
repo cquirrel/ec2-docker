@@ -6,6 +6,7 @@ on:
       portainer_admin_password:
         description: 'Portainer Admin Password'
         required: true
+        type: string
 
 jobs:
   terraform:
