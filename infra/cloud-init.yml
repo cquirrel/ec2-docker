@@ -2,17 +2,13 @@
 
 packages:
   - docker
-  - awscli  # Needed to pull from Secrets Manager
 
 runcmd:
   - systemctl start docker
   - systemctl enable docker
   - usermod -aG docker ec2-user
-  - curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-  - chmod +x /usr/local/bin/docker-compose
-  - ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 
-  # Fetch password from AWS Secrets Manager
+  # Calculate Portainer UI Admin password (Bcrypt)
   - export PORTAINER_PASS_BCRYPT=$(docker run --rm httpd:2.4-alpine htpasswd -nbB admin "#PORTAINER_PASS" | cut -d ":" -f2)
   - docker image rm httpd:2.4-alpine
 
@@ -20,9 +16,10 @@ runcmd:
   - docker volume create portainer_data
   - docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:lts --admin-password="${PORTAINER_PASS_BCRYPT}"
 
+  # Create Proxy network for NPM and
   - docker network create proxy
 
-  # Run Nginx Proxy Manager
+  # Run Nginx Proxy Manager (NPM)
   - docker volume create npm_data
   - docker volume create npm_letsencrypt
   - docker run -d --name npm --restart=always -p 80:80 -p 81:81 -p 443:443 -v npm_data:/data -v npm_letsencrypt:/etc/letsencrypt -e INITIAL_ADMIN_EMAIL="#NGINX_PM_USER" -e INITIAL_ADMIN_PASSWORD="#NGINX_PM_PASS" jc21/nginx-proxy-manager:latest
