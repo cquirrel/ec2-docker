@@ -12,7 +12,7 @@ if [ ${#missing_vars[@]} -ne 0 ]; then
 fi
 
 # Backend Variables
-BACKEND_BUCKET_NAME="cquirrel-ec2-docker-tf-backend"
+BACKEND_BUCKET_NAME="cquirrel-ec2-portainer-nginx-tf-backend"
 BACKEND_DYNAMODB_TABLE="terraform-locks"
 
 # Variables
