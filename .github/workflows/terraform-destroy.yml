@@ -28,4 +28,6 @@ jobs:
           terraform_version: 1.8.2
 
       - name: Terraform Destroy
-        run: ./destroy_infra.sh
+        run: |
+          chmod +x destroy_infra.sh
+          ./destroy_infra.sh
