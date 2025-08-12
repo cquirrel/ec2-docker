@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ -z "$PORTAINER_PASS" ] || [ -z "$NGINX_PM_USER" ] || [ -z "$NGINX_PM_PASS" ]; then
+  echo "Error: One or more required environment variables are not set: PORTAINER_PASS, NGINX_PM_USER, NGINX_PM_PASS"
+  exit 1
+fi
+
 # Backend Variables
 BACKEND_BUCKET_NAME="cquirrel-ec2-docker-tf-backend"
 BACKEND_DYNAMODB_TABLE="terraform-locks"
