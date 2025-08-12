@@ -11,6 +11,6 @@ terraform init \
   -backend-config="key=terraform.tfstate" \
   -backend-config="encrypt=true"
 
-terraform apply -auto-approve
+terraform destroy -auto-approve
 
 rm $DST_FILE

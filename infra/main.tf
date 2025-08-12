@@ -1,9 +1,14 @@
 provider "aws" {
-  version = "6.8.0"
 }
 
 terraform {
   backend "s3" {}
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "6.8.0"
+    }
+  }
 }
 
 # resource "aws_key_pair" "deployer" {
