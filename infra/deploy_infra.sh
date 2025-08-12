@@ -27,4 +27,6 @@ terraform init \
 
 terraform apply -auto-approve
 
+rm $DST_FILE
+
 terraform output instance_public_dns

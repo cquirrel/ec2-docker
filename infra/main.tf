@@ -1,4 +1,6 @@
-provider "aws" {}
+provider "aws" {
+  version = "6.8.0"
+}
 
 terraform {
   backend "s3" {}

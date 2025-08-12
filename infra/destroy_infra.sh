@@ -1,7 +1,9 @@
 BACKEND_BUCKET_NAME="cquirrel-ec2-docker-tf-backend"
 BACKEND_DYNAMODB_TABLE="terraform-locks"
 
-touch cloud-init-processed.yml
+DST_FILE="cloud-init-processed.yml"
+
+touch $DST_FILE
 
 terraform init \
   -backend-config="bucket=$BACKEND_BUCKET_NAME" \
@@ -10,3 +12,5 @@ terraform init \
   -backend-config="encrypt=true"
 
 terraform apply -auto-approve
+
+rm $DST_FILE
