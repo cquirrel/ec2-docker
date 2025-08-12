@@ -20,7 +20,10 @@ runcmd:
   - docker volume create portainer_data
   - docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:lts --admin-password="${PORTAINER_PASS_BCRYPT}"
 
+  - docker network create proxy
+
   # Run Nginx Proxy Manager
   - docker volume create npm_data
   - docker volume create npm_letsencrypt
   - docker run -d --name npm --restart=always -p 80:80 -p 81:81 -p 443:443 -v npm_data:/data -v npm_letsencrypt:/etc/letsencrypt -e INITIAL_ADMIN_EMAIL="#NGINX_PM_USER" -e INITIAL_ADMIN_PASSWORD="#NGINX_PM_PASS" jc21/nginx-proxy-manager:latest
+  - docker network connect proxy npm
