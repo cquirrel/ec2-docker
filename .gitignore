@@ -1,5 +1,10 @@
 .idea
+
 .terraform
 .terraform.lock.hcl
+
 terraform.tfstate
 terraform.tfstate.backup
+
+infra/cloud-init-processed.yml
+infra/terraform.tfvars

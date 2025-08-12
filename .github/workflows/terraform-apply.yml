@@ -27,25 +27,12 @@ jobs:
         with:
           terraform_version: 1.8.2
 
-      - name: Set bucket_safe_name
-        id: vars
-        run: |
-          BUCKET_NAME="${{ github.repository }}-tf-backend"
-          echo "bucket_safe_name=$(echo "$BUCKET_NAME" | tr '[:upper:]/' '[:lower:]-')" >> $GITHUB_OUTPUT
-
-      - name: Terraform Init
-        run: |
-          terraform init \
-            -backend-config="bucket=${{ steps.vars.outputs.bucket_safe_name }}" \
-            -backend-config="key=terraform.tfstate" \
-            -backend-config="dynamodb_table=terraform-locks" \
-            -backend-config="encrypt=true"
-
-      - name: Terraform Apply
-        run: |
-          terraform apply -auto-approve \
-            -var="bucket_name=${{ steps.vars.outputs.bucket_safe_name }}" \
-            -var="portainer_admin_password=${{ secrets.PORTAINER_ADMIN_PASSWORD }}"
+      - name: Deploy Infra
+        env:
+          PORTAINER_PASS=${{ secrets.PORTAINER_PASS }}
+          NGINX_PM_USER=${{ secrets.NGINX_PM_USER }}
+          NGINX_PM_PASS=${{ secrets.NGINX_PM_PASS }}
+        run: ./deploy_infra.sh
 
       - name: Show instance public DNS
         run: terraform output instance_public_dns

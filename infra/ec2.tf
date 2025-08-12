@@ -1,5 +1,3 @@
-data "aws_caller_identity" "current" {}
-
 data "aws_ami" "amazon_linux" {
   most_recent = true
   owners      = ["amazon"]
@@ -26,8 +24,8 @@ data "aws_ami" "amazon_linux" {
 }
 
 resource "aws_security_group" "sg" {
-  name        = "allow_ssh"
-  description = "Allow SSH inbound traffic"
+  name        = "ec2_docker_sg"
+  description = "Inbound/Outbound traffic rules"
 
   ingress {
     from_port   = 22
@@ -40,6 +38,22 @@ resource "aws_security_group" "sg" {
     description = "HTTP"
     from_port   = 80
     to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "HTTP"
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "HTTP"
+    from_port   = 81
+    to_port     = 81
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -81,13 +95,6 @@ resource "aws_iam_role" "ec2_ssm_role" {
           Service = "ec2.amazonaws.com"
         },
         Action = "sts:AssumeRole"
-      },
-      {
-        Effect = "Allow",
-        Principal = {
-          Service = "secretsmanager.amazonaws.com"
-        },
-        Action = "sts:AssumeRole"
       }
     ]
   })
@@ -124,39 +131,20 @@ resource "aws_iam_role_policy" "ec2_ssm_policy" {
           "s3:GetObject"
         ],
         Resource = "arn:aws:s3:::your-deploy-bucket/*"
-      },
-      {
-        Effect = "Allow",
-        Action = [
-          "secretsmanager:GetSecretValue"
-        ],
-        Resource = "arn:aws:secretsmanager:eu-west-1:${data.aws_caller_identity.current.account_id}:secret:portainer/admin-password*"
       }
     ]
   })
-}
-
-resource "aws_iam_instance_profile" "ec2_ssm_instance_profile" {
-  name = "ec2-ssm-instance-profile"
-  role = aws_iam_role.ec2_ssm_role.name
 }
 
 resource "aws_instance" "web" {
   ami                    = data.aws_ami.amazon_linux.id
   instance_type          = "t2.micro"
   #key_name               = aws_key_pair.deployer.key_name
-  iam_instance_profile   = aws_iam_instance_profile.ec2_ssm_instance_profile.name
+  #iam_instance_profile   = aws_iam_instance_profile.ec2_ssm_instance_profile.name
   vpc_security_group_ids = [aws_security_group.sg.id]
-  user_data              = file("cloud-init.yml")
-  depends_on = [
-    aws_secretsmanager_secret.portainer_password
-  ]
+  user_data              = file("cloud-init-processed.yml")
 
   tags = {
     Name = "DockerHost"
-  }
-
-  provisioner "local-exec" {
-    command = "echo ${self.public_dns}"
   }
 }
