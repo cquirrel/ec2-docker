@@ -1,6 +1,8 @@
 BACKEND_BUCKET_NAME="cquirrel-ec2-docker-tf-backend"
 BACKEND_DYNAMODB_TABLE="terraform-locks"
 
+touch cloud-init-processed.yml
+
 terraform init \
   -backend-config="bucket=$BACKEND_BUCKET_NAME" \
   -backend-config="dynamodb_table=$BACKEND_DYNAMODB_TABLE" \
