@@ -29,9 +29,9 @@ jobs:
 
       - name: Deploy Infra
         env:
-          PORTAINER_PASS=${{ secrets.PORTAINER_PASS }}
-          NGINX_PM_USER=${{ secrets.NGINX_PM_USER }}
-          NGINX_PM_PASS=${{ secrets.NGINX_PM_PASS }}
+          PORTAINER_PASS: ${{ secrets.PORTAINER_PASS }}
+          NGINX_PM_USER: ${{ secrets.NGINX_PM_USER }}
+          NGINX_PM_PASS: ${{ secrets.NGINX_PM_PASS }}
         run: ./deploy_infra.sh
 
       - name: Show instance public DNS

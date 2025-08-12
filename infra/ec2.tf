@@ -43,15 +43,7 @@ resource "aws_security_group" "sg" {
   }
 
   ingress {
-    description = "HTTP"
-    from_port   = 3000
-    to_port     = 3000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "HTTP"
+    description = "Nginx Proxy Manager UI"
     from_port   = 81
     to_port     = 81
     protocol    = "tcp"
