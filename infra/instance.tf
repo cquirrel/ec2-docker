@@ -1,12 +1,32 @@
+data "aws_ec2_instance_type_offerings" "all" {
+  location_type = "region"
+
+  filter {
+    name   = "instance-type"
+    values = ["t2.micro", "t3.micro"]
+  }
+}
+
+# Pick free-tier eligible type: prefer t2.micro, fallback to t3.micro
+locals {
+  selected_type = contains(data.aws_ec2_instance_type_offerings.all.instance_types, "t2.micro") ? "t2.micro" : "t3.micro"
+}
+
 resource "aws_instance" "web" {
   ami           = data.aws_ami.amazon_linux.id
-  instance_type = "t2.micro"
+  instance_type = local.selected_type
   vpc_security_group_ids = [aws_security_group.sg.id]
 
+  root_block_device {
+    volume_size = 30
+    volume_type = "gp3"
+  }
+
   user_data = templatefile("${path.module}/cloud-init.yml", {
-    portainer_password = var.portainer_password,
-    nginx_proxy_manager_email  = var.nginx_proxy_manager_email,
-    nginx_proxy_manager_password  = var.nginx_proxy_manager_password
+    PORTAINER_PASSWORD = var.portainer_password,
+    NGINX_PROXY_MANAGER_EMAIL  = var.nginx_proxy_manager_email,
+    NGINX_PROXY_MANAGER_PASSWORD  = var.nginx_proxy_manager_password
+    INSTANCE_SWAP_SIZE = var.instance_swap_size
   })
 
   tags = {

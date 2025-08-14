@@ -9,18 +9,27 @@ runcmd:
   - usermod -aG docker ec2-user
 
   # Calculate Portainer UI Admin password (Bcrypt)
-  - export PORTAINER_PASS_BCRYPT=$(docker run --rm httpd:2.4-alpine htpasswd -nbB admin "${portainer_password}" | cut -d ":" -f2)
+  - export PORTAINER_PASS_BCRYPT=$(docker run --rm httpd:2.4-alpine htpasswd -nbB admin "${PORTAINER_PASSWORD}" | cut -d ":" -f2)
   - docker image rm httpd:2.4-alpine
 
   # Run Portainer
   - docker volume create portainer_data
   - docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:lts --admin-password="$PORTAINER_PASS_BCRYPT"
 
-  # Create Proxy network for NPM and
+  # Create Proxy network for NPM and containers that require web exposure
   - docker network create proxy
 
   # Run Nginx Proxy Manager (NPM)
   - docker volume create npm_data
   - docker volume create npm_letsencrypt
-  - docker run -d --name npm --restart=always -p 80:80 -p 81:81 -p 443:443 -v npm_data:/data -v npm_letsencrypt:/etc/letsencrypt -e INITIAL_ADMIN_EMAIL="${nginx_proxy_manager_email}" -e INITIAL_ADMIN_PASSWORD="${nginx_proxy_manager_password}" jc21/nginx-proxy-manager:latest
+  - docker run -d --name npm --restart=always -p 80:80 -p 81:81 -p 443:443 -v npm_data:/data -v npm_letsencrypt:/etc/letsencrypt -e INITIAL_ADMIN_EMAIL="${NGINX_PROXY_MANAGER_EMAIL}" -e INITIAL_ADMIN_PASSWORD="${NGINX_PROXY_MANAGER_PASSWORD}" jc21/nginx-proxy-manager:latest
   - docker network connect proxy npm
+
+  # Add swap space
+  - sudo dd if=/dev/zero of=/mnt/ssd-swapfile bs=1M count=$((INSTANCE_SWAP_SIZE*1024))
+  - sudo chmod 600 /mnt/ssd-swapfile
+  - sudo mkswap /mnt/ssd-swapfile
+  - sudo swapon /mnt/ssd-swapfile
+  - echo '/mnt/ssd-swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+  - echo "vm.swappiness=10" | sudo tee -a /etc/sysctl.conf
+  - sudo sysctl -p
