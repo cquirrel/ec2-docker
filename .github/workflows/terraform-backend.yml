@@ -24,12 +24,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ vars.AWS_REGION }}
 
-      - name: Set bucket_safe_name
-        id: vars
-        run: |
-          BUCKET_NAME="${{ github.repository }}-tf-backend"
-          echo "bucket_safe_name=$(echo "$BUCKET_NAME" | tr '[:upper:]/' '[:lower:]-')" >> $GITHUB_OUTPUT
-
       - name: Terraform Init
         run: terraform init
 
@@ -38,4 +32,4 @@ jobs:
           AWS_REGION: ${{ vars.AWS_REGION }}
         run: |
           terraform apply -auto-approve \
-            -var="bucket_name=${{ steps.vars.outputs.bucket_safe_name }}"
+            -var="bucket_name=${{ secrets.BACKEND_BUCKET_NAME }}"

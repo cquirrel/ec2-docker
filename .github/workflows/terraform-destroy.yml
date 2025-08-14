@@ -27,7 +27,18 @@ jobs:
         with:
           terraform_version: 1.8.2
 
-      - name: Terraform Destroy
+      - name: Terraform Init
         run: |
-          chmod +x destroy_infra.sh
-          ./destroy_infra.sh
+          terraform init \
+            -backend-config="bucket=${{ secrets.BACKEND_BUCKET_NAME }}" \
+            -backend-config="key=terraform.tfstate" \
+            -backend-config="dynamodb_table=terraform-locks" \
+            -backend-config="encrypt=true"
+
+      - name: Terraform Apply
+        env:
+          TF_VAR_portainer_password: ${{ secrets.PORTAINER_PASS }}
+          TF_VAR_nginx_proxy_manager_email: ${{ secrets.NGINX_PM_USER }}
+          TF_VAR_nginx_proxy_manager_password: ${{ secrets.NGINX_PM_PASS }}
+        run: |
+          terraform destroy -auto-approve

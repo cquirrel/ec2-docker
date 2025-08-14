@@ -27,12 +27,29 @@ jobs:
         with:
           terraform_version: 1.8.2
 
+      - name: Terraform Init
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ secrets.BACKEND_BUCKET_NAME }}" \
+            -backend-config="key=terraform.tfstate" \
+            -backend-config="dynamodb_table=terraform-locks" \
+            -backend-config="encrypt=true"
+
       - name: Terraform Apply
         env:
-          PORTAINER_PASS: ${{ secrets.PORTAINER_PASS }}
-          NGINX_PM_USER: ${{ secrets.NGINX_PM_USER }}
-          NGINX_PM_PASS: ${{ secrets.NGINX_PM_PASS }}
-        run: ./deploy_infra.sh
+          TF_VAR_portainer_password: ${{ secrets.PORTAINER_PASS }}
+          TF_VAR_nginx_proxy_manager_email: ${{ secrets.NGINX_PM_USER }}
+          TF_VAR_nginx_proxy_manager_password: ${{ secrets.NGINX_PM_PASS }}
+        run: |
+          terraform apply -auto-approve
 
-      - name: Show instance public DNS
-        run: terraform output instance_public_dns
+      - name: Validate deployment
+        run: |
+          DOMAIN=$(terraform output -raw instance_public_dns)
+          echo "Waiting for https://$DOMAIN:9443 to respond..."
+          timeout 120 bash -c "
+            until curl -sk --max-time 5 https://$DOMAIN:9443 > /dev/null; do
+              echo 'Still waiting...'
+              sleep 15
+            done
+          "
