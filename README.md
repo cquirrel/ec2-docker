@@ -13,7 +13,7 @@ This is ideal for experimenting or running lightweight projects on AWS Free Tier
 - **Add your AWS credentials and service passwords** as GitHub secrets and variables.
 - **Trigger the provided GitHub Actions workflows** to provision and manage your EC2 instance.
 
-Everything is automated: Terraform and shell scripts run inside GitHub Actions.
+Everything is automated by Terraform.
 
 ---
 
@@ -25,6 +25,7 @@ Before running any workflow, set up the following exactly as named below.
 |---------------------|-----------|-----------------------------------------------|
 | `AWS_ACCESS_KEY_ID` | Secret    | Your AWS access key ID                        |
 | `AWS_SECRET_ACCESS_KEY` | Secret| Your AWS secret access key                    |
+| `BACKEND_BUCKET_NAME` | Secret| Terraform State S3 Bucket (holds state)                   |
 | `PORTAINER_PASS`    | Secret    | Initial password for the Portainer admin user |
 | `NGINX_PM_USER`     | Secret    | Username for Nginx Proxy Manager              |
 | `NGINX_PM_PASS`     | Secret    | Password for Nginx Proxy Manager              |
@@ -37,11 +38,10 @@ Before running any workflow, set up the following exactly as named below.
 
 **Note:**  
 - Names are case-sensitive and must match exactly.
-- Do **not** use the old names from previous versions (`PORTAINER_ADMIN_PASSWORD`, `NGINX_BASIC_AUTH_USER`, etc.).
 
 ---
 
-## Deployment Steps
+## Deployment Steps (follow the order)
 
 1. **Execute the Backend Workflow**
 
