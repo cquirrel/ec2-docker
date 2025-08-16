@@ -1,18 +1,6 @@
-resource "aws_ec2_instance_connect_endpoint" "eic" {
-  subnet_id = aws_instance.web.subnet_id
-}
-
 resource "aws_security_group" "sg" {
   name        = "ec2_docker_sg"
   description = "Inbound/Outbound traffic rules"
-
-  ingress {
-    description      = "Allow SSH from EIC endpoint"
-    from_port        = 22
-    to_port          = 22
-    protocol         = "tcp"
-    security_groups  = [aws_ec2_instance_connect_endpoint.eic.security_group_ids[0]]
-  }
 
   ingress {
     description = "HTTP"
@@ -53,4 +41,31 @@ resource "aws_security_group" "sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+resource "aws_iam_role" "ssm_role" {
+  name = "ec2-ssm-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_managed" {
+  role       = aws_iam_role.ssm_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_instance_profile" "ssm_instance_profile" {
+  name = "ec2-ssm-instance-profile"
+  role = aws_iam_role.ssm_role.name
 }

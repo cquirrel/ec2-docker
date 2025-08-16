@@ -16,6 +16,7 @@ resource "aws_instance" "web" {
   ami           = data.aws_ami.amazon_linux.id
   instance_type = local.selected_type
   vpc_security_group_ids = [aws_security_group.sg.id]
+  iam_instance_profile   = aws_iam_instance_profile.ssm_instance_profile.name
 
   root_block_device {
     volume_size = 30
