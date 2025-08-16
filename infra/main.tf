@@ -2,7 +2,11 @@ provider "aws" {
 }
 
 terraform {
-  backend "s3" {}
+  backend "s3" {
+    key = "terraform.tfstate",
+    dynamodb_table = "terraform-locks"
+    encrypt = true
+  }
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -10,8 +14,3 @@ terraform {
     }
   }
 }
-
-# resource "aws_key_pair" "deployer" {
-#   key_name   = "deployer-key"
-#   public_key = file("~/.ssh/id_ed25519.pub")
-# }

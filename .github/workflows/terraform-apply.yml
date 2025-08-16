@@ -30,10 +30,7 @@ jobs:
       - name: Terraform Init
         run: |
           terraform init \
-            -backend-config="bucket=${{ secrets.BACKEND_BUCKET_NAME }}" \
-            -backend-config="key=terraform.tfstate" \
-            -backend-config="dynamodb_table=terraform-locks" \
-            -backend-config="encrypt=true"
+            -backend-config="bucket=${{ secrets.BACKEND_BUCKET_NAME }}"
 
       - name: Terraform Apply
         env:
