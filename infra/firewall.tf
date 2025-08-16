@@ -1,12 +1,17 @@
+resource "aws_ec2_instance_connect_endpoint" "eic" {
+  subnet_id = aws_instance.web.subnet_id
+}
+
 resource "aws_security_group" "sg" {
   name        = "ec2_docker_sg"
   description = "Inbound/Outbound traffic rules"
 
   ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    description      = "Allow SSH from EIC endpoint"
+    from_port        = 22
+    to_port          = 22
+    protocol         = "tcp"
+    security_groups  = [aws_ec2_instance_connect_endpoint.eic.security_group_ids[0]]
   }
 
   ingress {
