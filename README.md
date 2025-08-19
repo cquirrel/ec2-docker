@@ -1,4 +1,4 @@
-# EC2 Portainer Nginx [IaC]
+# EC2 Portainer Nginx (Proxy Manager) [IaC]
 
 This repository lets any GitHub user fork and deploy an AWS EC2 instance with Docker, Portainer, and Nginx—all managed via GitHub Actions.  
 **No local setup is required.**  
@@ -23,13 +23,14 @@ Before running any workflow, set up the following exactly as named below.
 
 | Name                | Type      | Description                                   |
 |---------------------|-----------|-----------------------------------------------|
+| `AWS_REGION`        | Variable  | The AWS region for resources (e.g., `us-east-1`) |
 | `AWS_ACCESS_KEY_ID` | Secret    | Your AWS access key ID                        |
 | `AWS_SECRET_ACCESS_KEY` | Secret| Your AWS secret access key                    |
 | `BACKEND_BUCKET_NAME` | Secret| Terraform State S3 Bucket (holds state)                   |
 | `PORTAINER_PASS`    | Secret    | Initial password for the Portainer admin user |
 | `NGINX_PM_USER`     | Secret    | Username for Nginx Proxy Manager              |
 | `NGINX_PM_PASS`     | Secret    | Password for Nginx Proxy Manager              |
-| `AWS_REGION`        | Variable  | The AWS region for resources (e.g., `us-east-1`) |
+
 
 **How to add:**
 1. Go to your forked repository on GitHub.
@@ -66,7 +67,7 @@ Before running any workflow, set up the following exactly as named below.
 ## Accessing Your Services
 
 - **Portainer UI:**  
-  Visit `http://<your-ec2-public-ip>/portainer`  
+  Visit `https://<your-ec2-public-ip>:9443`  
   Log in with the username `admin` and the password you set in `PORTAINER_PASS`.
 
 - **Nginx Proxy Manager:**  
@@ -86,14 +87,10 @@ Before running any workflow, set up the following exactly as named below.
 
 ## Clean Up
 
-To destroy all resources, run the destroy workflow (if provided), or manually run `terraform destroy` via GitHub Actions.
+To destroy all resources, run the destroy workflow, via GitHub Actions.
 
 ---
 
 ## License
 
 MIT License. See [LICENSE](LICENSE).
-
----
-
-*Deploy from anywhere. No manual setup. Just fork, set secrets & variables, and run!*
